@@ -9,11 +9,6 @@ app.config["JSON_AS_ASCII"] = False
 CORS(app)
 
 # server mysql 
-host = "localhost"
-user = "root"
-password = ""
-db = "traveling"
-
 def connectDatabase ():
     return mysql.connector.connect(
         host = "localhost",
@@ -21,6 +16,11 @@ def connectDatabase ():
         password = "",
         db = "traveling"
     )
+
+# home page api
+@app.route("/")
+def home():
+    return "Welcome to my api"
 
 # create database 
 @app.route("/api/attractions")
@@ -37,10 +37,9 @@ def read():
     myResult = myCursor.fetchall()
     return  make_response(jsonify(myResult), 200)
 
-# read by id
+# # read by id
 @app.route("/api/attractions/<id>")
 def readById(id):
-    
     # connect database
     mydb = connectDatabase()
 
@@ -58,22 +57,15 @@ def readById(id):
     return  make_response(jsonify(myResult), 200) 
 
 
-#create data in api
+# #create data in api
 @app.route("/api/attractions", methods = ['POST'])
-def crete():
-
-    # connect database
-    mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "",
-        db = "traveling"
-    )
+def create():
 
     # get json data from request
     data = request.get_json()
 
-
+    # connect database
+    mydb = connectDatabase()
     mycursor = mydb.cursor(dictionary=True)
     sql = "INSERT INTO attractions (name, detail) VALUES (%s, %s)"
     val = (data["name"], data["detail"])
@@ -82,59 +74,42 @@ def crete():
     return make_response(jsonify({ "rowcount": mycursor.rowcount }), 200)
 
 
+# update data in api
 @app.route("/api/attractions/<id>" , methods = ['PUT'])
 def update(id):
-    # connect database
-    mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "",
-        db = "traveling"
-    )
-
     # get json data from request
     data = request.get_json()
 
+    # connect database and show by dict
+    mydb = connectDatabase()
     mycursor = mydb.cursor(dictionary=True)
+
+    # select by id to update new data
     sql = "UPDATE attractions SET name = %s, detail = %s WHERE id = %s"
     val = (data['name'], data['detail'], id)
     mycursor.execute(sql, val)
     mydb.commit()
+
+     # show the response after delete
     return make_response(jsonify({ "rowcount" : mycursor.rowcount }), 200)
 
 
-
+# delete data in api
 @app.route("/api/attractions/<id>" , methods = ['DELETE'])
 def delete(id):
     # connect database
-    mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "",
-        db = "traveling"
-    )
-
+    mydb = connectDatabase()
     mycursor = mydb.cursor(dictionary=True)
+    
+    # select of the id to delete
     sql = "DELETE FROM attractions WHERE id = %s"
     val = (id,)
     mycursor.execute(sql, val)
     mydb.commit()
+
+    # show the response after delete
     return make_response(jsonify({ "rowcount" : mycursor.rowcount }), 200)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-    #     # return by dict
-    # myCursor = mydb.cursor(dictionary=True)
-
-    # # get data for insert to api
-    # sql = "INSERT INTO attractions (name, detail) VALUES (%s, %s)"
-    # val = (data['name'], data['detail'])
-
-    # # # set for insetrt
-    # myCursor.execute(sql, val)
-    # mydb.commit()
-
-    # # show th effect when insert
-    # return make_response(jsonify({"rowcount" : myCursor.rowcount}), 200)
