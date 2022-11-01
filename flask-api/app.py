@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import json
 import mysql.connector
+import requests
 
 app = Flask(__name__)
 # show to human language
@@ -16,6 +17,19 @@ def connectDatabase ():
         password = "",
         db = "traveling"
     )
+
+# chcek the id for update and delete
+response_API = requests.get('http://127.0.0.1:5000/api/attractions').text
+data = json.loads(response_API)
+print(data)
+
+def filterId(id):
+    for d in data:
+        if d["id"] != id:
+            return "A"
+        else:
+            return "B"
+print(filterId(1))
 
 # home page api
 @app.route("/")
