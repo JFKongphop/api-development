@@ -62,7 +62,6 @@ def readById(id):
 @app.route("/api/attractions", methods = ['POST'])
 def crete():
 
-
     # connect database
     mydb = mysql.connector.connect(
         host = "localhost",
@@ -83,7 +82,7 @@ def crete():
     return make_response(jsonify({ "rowcount": mycursor.rowcount }), 200)
 
 
-@app.route("/api/attractions/<id>" , methods = [ ' PUT ' ])
+@app.route("/api/attractions/<id>" , methods = ['PUT'])
 def update(id):
     # connect database
     mydb = mysql.connector.connect(
@@ -98,15 +97,15 @@ def update(id):
 
     mycursor = mydb.cursor(dictionary=True)
     sql = "UPDATE attractions SET name = %s, detail = %s WHERE id = %s"
-    val = (data[' name' ], data[ ' detail' ], id)
+    val = (data['name'], data['detail'], id)
     mycursor.execute(sql, val)
     mydb.commit()
     return make_response(jsonify({ "rowcount" : mycursor.rowcount }), 200)
 
 
 
-@app.route("/api/attractions/<id>" , methods = [ ' DELETE ' ])
-def update(id):
+@app.route("/api/attractions/<id>" , methods = ['DELETE'])
+def delete(id):
     # connect database
     mydb = mysql.connector.connect(
         host = "localhost",
